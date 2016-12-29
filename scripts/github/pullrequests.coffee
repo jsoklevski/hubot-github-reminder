@@ -15,6 +15,7 @@ class PullRequests
   constructor: (@robot, @key) ->
     @robot.brain.once 'loaded', =>
       @robot.logger.error "Loading Cache"
+      @_clearCache.bind(@)
       # Run a cron job that runs every day at 4:00 am
       new cronJob('0 4 * * * *', @_clearCache.bind(@), null, true)
 
