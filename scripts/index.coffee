@@ -35,7 +35,6 @@ Adapters = require "./adapters"
 Config = require "./config"
 Github = require "./github"
 Reminders = require "./reminders"
-GithubDataService = require "./github-service"
 Utils = require "./utils"
 
 class GithubBot
@@ -43,7 +42,6 @@ class GithubBot
   constructor: (@robot) ->
     return new GithubBot @robot unless @ instanceof GithubBot
     Utils.robot = @robot
-    GithubDataService.robot = @robot
     @reminders = new Reminders @robot, "github-reminders", (hubotUsername) ->
       githubUserName Utils.lookupUserWithHubot hubotUsername
       Github.GitHubDataService.openForUser githubUserName
