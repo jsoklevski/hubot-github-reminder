@@ -26,7 +26,8 @@
     "fuse.js": "^2.0.1",
     "moment": "^2.10.6",
     "octokat": "^0.6.0-0",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "promise": "6.1.0"
   },
   "main": "index.coffee",
   "directories": {
