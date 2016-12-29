@@ -3,6 +3,10 @@ A hubot script to list and recurrently remind you about open pull requests.
 Optionally receive direct messages when you are assigned to a pull
 request in your organization or for a specific repo or set of repos.
 
+The implementation of this bot is simular to https://github.com/ndaversa/hubot-github-bot the difference is that remiders are send as direct messages to the users.
+Pullrequest results are cached each day at 4:00am or when starting the bot. And daily updates to the cache are done using webhooks
+
+
 ###Dependencies
 - coffeescript
 - cron

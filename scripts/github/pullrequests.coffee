@@ -2,7 +2,6 @@ _ = require "underscore"
 
 Octokat = require "octokat"
 Config = require "../config"
-PullRequest = require "./pullrequest"
 Utils = require "../utils"
 Promise = require "promise"
 cronJob = require("cron").CronJob
@@ -15,8 +14,8 @@ class PullRequests
 
   constructor: (@robot, @key) ->
     @robot.brain.once 'loaded', =>
-      # Run a cron job that runs every minute, Monday-Friday
       @_clearCache()
+      # Run a cron job that runs every day at 4:00 am
       new cronJob('0 4 * * * *', @_clearCache.bind(@), null, true)
 
   _clearCache: () ->
