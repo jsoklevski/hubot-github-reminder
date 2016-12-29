@@ -117,13 +117,13 @@ class GithubBot
 
 
     @robot.hear /(?:github|gh|git) I am (.*)/i, (msg) =>
-      hubotUser = msg.message.user?.name?
-      github_user = msg.match
+      hubotUser = msg.message.user.name
+      github_user = msg.match[1]
       Utils.saveGithubUser hubotUser, github_user
       @send msg, " #{hubotUser} saved as #{github_user}"
 
     @robot.respond /(?:github|gh|git) delete all reminders/i, (msg) =>
-      hubotUser = msg.message.user?.name?.toLowerCase()
+      hubotUser = msg.message.user.name
       remindersCleared = @reminders.clearAllForUser hubotUser
       @send msg, """
         Deleted #{remindersCleared} reminder#{if remindersCleared is 1 then "" else "s"}.
@@ -132,7 +132,7 @@ class GithubBot
 
     @robot.respond /(?:github|gh|git) delete ([0-5]?[0-9]:[0-5]?[0-9]) reminder/i, (msg) =>
       [__, time] = msg.match
-      hubotUser = msg.message.user?.name?
+      hubotUser = msg.message.user.name
       remindersCleared = @reminders.clearForUserAtTime hubotUser, time
       if remindersCleared is 0
         @send msg, "Nice try. You don't even have a reminder at #{time}"
@@ -141,12 +141,12 @@ class GithubBot
 
     @robot.respond /(?:github|gh|git) remind(?:er)? ((?:[01]?[0-9]|2[0-4]):[0-5]?[0-9])$/i, (msg) =>
       [__, time] = msg.match
-      hubotUser = msg.message.user?.name?
+      hubotUser = msg.message.user.name
       @reminders.save hubotUser, time
       @send msg, "Ok, from now on I'll remind this room about open pull requests every weekday at #{time}"
 
     @robot.respond /(?:github|gh|git) list reminders$/i, (msg) =>
-      hubotUser = msg.message.user?.name?
+      hubotUser = msg.message.user.name
       reminders = @reminders.getForUser hubotUser
       if reminders.length is 0
         @send msg, "Well this is awkward. You haven't got any github reminders set :-/"
@@ -168,14 +168,9 @@ class GithubBot
     @robot.respond /(?:github|gh|git) (?:prs|open)(?:\s+(?:for|by)\s+(?:@?)(.*))?/i, (msg) =>
       [__, who] = msg.match
 
-      if who is 'me'
-        who = msg.message.user?.name?.toLowerCase()
 
-      if who?
-        who = @robot.brain.userForName who
-        who = who.name
-      githubUserName Utils.lookupUserWithHubot who
-      Github.GitHubDataService.openForUser(who)
+      githubUserName = Utils.lookupUserWithHubot who
+      Github.GitHubDataService.openForUser(githubUserName)
       .catch (e) => @send msg, e
 
   module.exports = GithubBot
