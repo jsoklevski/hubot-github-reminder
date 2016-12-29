@@ -64,7 +64,7 @@ class PullRequests
         for p in repo when p
           cacheResult.push p
       @robot.brain.set @key, cacheResult
-      @robot.logger.error "Finished Loading Cache"
+      @robot.logger.error @key
     .catch ( error ) ->
       Utils.robot.logger.error error
       Promise.reject error

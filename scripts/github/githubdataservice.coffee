@@ -4,11 +4,10 @@ PullRequest = require "./pullrequest"
 
 
 class GitHubDataService
-  githubPullRequestsData = "github-pr-cache"
 
 
   @openForUser: (githubUserName) ->
-    pullrequestsData = Utils.robot.brain.get(githubPullRequestsData)
+    pullrequestsData = Utils.robot.brain.get("github-pr-cache")
 
     pullRequestsForUser = []
 
