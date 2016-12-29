@@ -42,6 +42,7 @@ class GithubBot
   constructor: (@robot) ->
     return new GithubBot @robot unless @ instanceof GithubBot
     Utils.robot = @robot
+    @robot.brain.set "Init", "Init"
     @reminders = new Reminders @robot, "github-reminders", (hubotUsername) ->
       githubUserName Utils.lookupUserWithHubot hubotUsername
       Github.GitHubDataService.openForUser githubUserName

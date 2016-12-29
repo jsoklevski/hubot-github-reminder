@@ -32,10 +32,10 @@ class PullRequests
     org = octo.orgs(Config.github.organization)
     org.repos.fetch()
     .then (page) ->
-      results = page;
+      results = []
       handlePage = (pageResults) ->
         results = results.concat(pageResults);
-        if true then return results;
+        if pageResults.nextPage == undefined then return results;
         return pageResults.nextPage().then(handlePage);
       handlePage(page)
     .then (results) ->
@@ -52,6 +52,7 @@ class PullRequests
                 assigneesList.push(assignee.login)
 
               pullRequestObject = {
+                number : fetchedPullRequest.number
                 url : fetchedPullRequest.url
                 state : fetchedPullRequest.state
                 title : fetchedPullRequest.title
