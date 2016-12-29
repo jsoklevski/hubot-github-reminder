@@ -14,7 +14,7 @@ class PullRequests
 
   constructor: (@robot, @key) ->
     @robot.brain.once 'loaded', =>
-      @_clearCache()
+      @robot.logger.error "Loading Cache"
       # Run a cron job that runs every day at 4:00 am
       new cronJob('0 4 * * * *', @_clearCache.bind(@), null, true)
 
@@ -64,6 +64,7 @@ class PullRequests
         for p in repo when p
           cacheResult.push p
       @robot.brain.set @key, cacheResult
+      @robot.logger.error "Finished Loading Cache"
     .catch ( error ) ->
       Utils.robot.logger.error error
       Promise.reject error

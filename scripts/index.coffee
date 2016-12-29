@@ -47,7 +47,7 @@ class GithubBot
       Github.GitHubDataService.openForUser githubUserName
 
     @cacheRefresh = new Github.PullRequests @robot, "github-pr-cache"
-
+    @cacheRefresh._clearCache()
     @webhook = new Github.Webhook @robot
     switch @robot.adapterName
       when "slack"
