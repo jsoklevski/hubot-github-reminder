@@ -49,8 +49,6 @@ class GithubBot
     @robot.logger.info "Cache Init"
     @cacheRefresh = new Github.PullRequests @robot, "github-pr-cache"
 
-    @cacheRefresh.initializeCache
-
     @webhook = new Github.Webhook @robot
     switch @robot.adapterName
       when "slack"
