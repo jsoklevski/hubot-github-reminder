@@ -39,7 +39,7 @@ class PullRequests
         results = results.concat(pageResults);
         if pageResults.nextPage == undefined then return results;
         return pageResults.nextPage().then(handlePage);
-      handlePage(page)
+      return handlePage(page)
     .then (results) ->
       return Promise.all results.map (currentRepo) ->
         @robot.logger.info "Porcessing Repo #{currentRepo.name}"
@@ -47,10 +47,10 @@ class PullRequests
         repo.pulls.fetch(state: "open")
         .then (json) ->
           return Promise.all json.map (pr) ->
-            @robot.logger.info "Porcessing PR #{pr.number}"
+            @robot.logger.info "Porcessing PR #{pr.number} repo name #{currentRepo.name}"
             repo.pulls(pr.number).fetch()
             .then (fetchedPullRequest) ->
-              @robot.logger.info "PullRequest PR #{fetchedPullRequest.number}"
+              @robot.logger.info "PullRequest PR #{fetchedPullRequest.number} repo name #{currentRepo.name}"
               assigneesList = []
               fetchedPullRequest.assignees.map (assignee) ->
                 assigneesList.push(assignee.login)
