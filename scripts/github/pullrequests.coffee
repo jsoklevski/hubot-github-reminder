@@ -33,6 +33,7 @@ class PullRequests
     org.repos.fetch()
     .then (page) ->
       results = []
+      @robot.logger.info "Page Loaded"
       handlePage = (pageResults) ->
         results = results.concat(pageResults);
         if pageResults.nextPage == undefined then return results;
@@ -40,13 +41,15 @@ class PullRequests
       handlePage(page)
     .then (results) ->
       return Promise.all results.map (currentRepo) ->
+        @robot.logger.info "Porcessing Repo #{currentRepo.name}"
         repo = octo.repos(Config.github.organization, currentRepo.name)
         repo.pulls.fetch(state: "open")
         .then (json) ->
           return Promise.all json.map (pr) ->
+            @robot.logger.info "Porcessing PR #{pr.number}"
             repo.pulls(pr.number).fetch()
             .then (fetchedPullRequest) ->
-
+              @robot.logger.info "PullRequest PR #{fetchedPullRequest.number}"
               assigneesList = []
               fetchedPullRequest.assignees.map (assignee) ->
                 assigneesList.push(assignee.login)
