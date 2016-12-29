@@ -1,0 +1,40 @@
+{
+  "name": "hubot-github-reminder",
+  "version": "1.0.0",
+  "private": false,
+  "author": "Springworks",
+  "description": "A simple helpful robot for your Company",
+  "license": "MIT",
+  "keywords": [
+    "hubot",
+    "hubot-scripts",
+    "slack",
+    "github",
+    "pull-requests",
+    "pulls"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:jsoklevski/hubot-github-reminder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jsoklevski/hubot-github-reminder/issues"
+  },
+  "dependencies": {
+    "coffee-script": "^1.10.0",
+    "cron": "^1.0.9",
+    "fuse.js": "^2.0.1",
+    "moment": "^2.10.6",
+    "octokat": "^0.6.0-0",
+    "underscore": "^1.8.3"
+  },
+  "main": "index.coffee",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://github.com/jsoklevski/hubot-github-reminder",
+  "devDependencies": {}
+}
