@@ -19,12 +19,15 @@ class PullRequests
       new cronJob('0 4 * * * *', @_clearCache.bind(@), null, true)
 
   _clearCache: ->
+    @robot.logger.info "clear Cache"
     @_getAllOpenPullRequestsForAllRepose()
 
   initializeCache: ->
+    @robot.logger.info "init Cache"
     @_getAllOpenPullRequestsForAllRepose()
 
   _getAllOpenPullRequestsForAllRepose: ->
+    @robot.logger.info "loading Cache"
     org = octo.orgs(Config.github.organization)
     org.repos.fetch()
     .then (page) ->

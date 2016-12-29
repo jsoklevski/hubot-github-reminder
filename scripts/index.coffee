@@ -46,8 +46,9 @@ class GithubBot
       githubUserName Utils.lookupUserWithHubot hubotUsername
       Github.GitHubDataService.openForUser githubUserName
 
-
+    @robot.logger.info "Cache Init"
     @cacheRefresh = new Github.PullRequests @robot, "github-pr-cache"
+
     @cacheRefresh.initializeCache
 
     @webhook = new Github.Webhook @robot
