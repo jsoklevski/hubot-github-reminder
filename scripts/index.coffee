@@ -42,7 +42,6 @@ class GithubBot
   constructor: (@robot) ->
     return new GithubBot @robot unless @ instanceof GithubBot
     Utils.robot = @robot
-    @robot.brain.set "Init", "Init"
     @reminders = new Reminders @robot, "github-reminders", (hubotUsername) ->
       githubUserName Utils.lookupUserWithHubot hubotUsername
       Github.GitHubDataService.openForUser githubUserName
@@ -170,7 +169,7 @@ class GithubBot
     @robot.respond /(?:github|gh|git) (?:prs|open)(?:\s+(?:for|by)\s+(?:@?)(.*))?/i, (msg) =>
       [__, who] = msg.match
 
-
+      @robot.logger.info "Get PR for  #{who}"
       githubUserName = Utils.lookupUserWithHubot who
       Github.GitHubDataService.openForUser(githubUserName)
       .catch (e) => @send msg, e
