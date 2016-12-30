@@ -32,7 +32,7 @@ class PullRequests
       results = []
       handlePage = (pageResults) ->
         results = results.concat(pageResults);
-        if pageResults.nextPage == undefined then return results;
+        if pageResults.nextPage == undefined then return Promise.resolve results;
         return pageResults.nextPage().then(handlePage);
       handlePage(page)
     .catch (error) ->
