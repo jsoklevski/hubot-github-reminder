@@ -14,11 +14,8 @@ class PullRequests
 
   constructor: (@robot, @key) ->
     @robot.brain.once 'loaded', =>
-      @robot.logger.error "Loading Cache"
-      @robot.logger.error @key
       # Run a cron job that runs every day at 4:00 am
-      @initializeCache()
-      new cronJob('0 4 * * * *', @_clearCache.bind(@), null, true)
+      new cronJob('00 00 4 * * *', @_clearCache.bind(@), null, true, null, null, true)
 
   _clearCache: ->
     @robot.logger.info "clear Cache"
@@ -57,6 +54,7 @@ class PullRequests
       for p in repo when p
         cacheResult.push p
     @robot.brain.set @key, cacheResult
+    @@robot.logger.info "Cache Saved key used: #{@key}"
 
   processRepos= (results) ->
     return Promise.all results.map (currentRepo) ->

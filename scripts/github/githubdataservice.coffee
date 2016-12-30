@@ -11,9 +11,10 @@ class GitHubDataService
 
     pullRequestsForUser = []
 
-    for pr in pullrequestsData
-      for assignee in pr.assignenes when assignee
-        if assignee == githubUserName then pullRequestsForUser.push new PullRequest pr githubUserName
+    if pullrequestsData != null
+      for pr in pullrequestsData
+        for assignee in pr.assignenes when assignee
+          if assignee == githubUserName then pullRequestsForUser.push new PullRequest pr githubUserName
 
     if pullRequestsForUser.length != 0
       Utils.robot.emit "GithubPullRequestsOpenForUser", pullRequestsForUser, githubUserName
