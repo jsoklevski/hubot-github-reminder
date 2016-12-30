@@ -54,7 +54,7 @@ class PullRequests
       for p in repo when p
         cacheResult.push p
     @robot.brain.set @key, cacheResult
-    @@robot.logger.info "Cache Saved key used: #{@key}"
+    @robot.logger.info "Cache Saved key used: #{@key}"
 
   processRepos= (results) ->
     return Promise.all results.map (currentRepo) ->
