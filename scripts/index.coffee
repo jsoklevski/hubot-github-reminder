@@ -47,7 +47,7 @@ class GithubBot
       Github.GitHubDataService.openForUser githubUserName
 
     @robot.logger.info "Cache Init"
-    @cacheRefresh = new Github.PullRequests @robot, "github-pr-cache"
+    @cacheRefresh = new Github.PullRequests @robot
 
     @webhook = new Github.Webhook @robot
     switch @robot.adapterName
@@ -147,8 +147,12 @@ class GithubBot
     @robot.respond /(?:github|gh|git) remind(?:er)? ((?:[01]?[0-9]|2[0-4]):[0-5]?[0-9])$/i, (msg) =>
       [__, time] = msg.match
       hubotUser = msg.message.user.name
-      @reminders.save hubotUser, time
-      @send msg, "Ok, from now on I'll remind this room about open pull requests every weekday at #{time}"
+      githubUserName = Utils.lookupUserWithHubot hubotUser
+      if githubUserName
+        @reminders.save hubotUser, time
+        @send msg, "Ok, from now on I'll remind this room about open pull requests every weekday at #{time}"
+      else
+        @send msg, "Please first provide your githubusername using  I am  command "
 
     @robot.respond /(?:github|gh|git) list reminders$/i, (msg) =>
       hubotUser = msg.message.user.name
@@ -168,6 +172,8 @@ class GithubBot
         #{@robot.name} github list reminders - See all pull request reminders for this room.
         #{@robot.name} github delete hh:mm reminder - If you have a reminder at hh:mm, I'll delete it.
         #{@robot.name} github delete all reminders - Deletes all reminders for this room.
+        #{@robot.name} github I am <user> - Provides the github username for the given slack user
+        #{@robot.name} github Init cache - Reinitializes cache
       """
 
     @robot.respond /(?:github|gh|git) (?:prs|open)(?:\s+(?:for|by)\s+(?:@?)(.*))?/i, (msg) =>

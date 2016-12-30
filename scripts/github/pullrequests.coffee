@@ -12,7 +12,7 @@ octo = new Octokat
 
 class PullRequests
 
-  constructor: (@robot, @key) ->
+  constructor: (@robot) ->
     @robot.brain.once 'loaded', =>
       # Run a cron job that runs every day at 4:00 am
       new cronJob('00 00 4 * * *', @_clearCache.bind(@), null, true, null, null, true)
@@ -57,8 +57,8 @@ class PullRequests
     for repo in pullRequestObjects
       for p in repo when p
         cacheResult.push p
-    @robot.brain.set @key, cacheResult
-    @robot.logger.info "Cache Saved key used: #{@key}"
+    @robot.brain.set "github-pr-cache", cacheResult
+    @robot.logger.info "Cache Saved key used: github-pr-cache"
 
   _processRepos= (results) ->
     return Promise.all results.map (currentRepo) ->
@@ -66,10 +66,8 @@ class PullRequests
       repo.pulls.fetch(state: "open")
       .then (json) ->
         return Promise.all json.map (pr) ->
-          @robot.logger.info "Porcessing PR #{pr.number} repo name #{currentRepo.name}"
           repo.pulls(pr.number).fetch()
           .then (fetchedPullRequest) ->
-            @robot.logger.info "2 PR #{pr.number} repo name #{currentRepo.name}"
             _formatPullRequest fetchedPullRequest, currentRepo.name
           .catch (error) ->
             Utils.robot.logger.error "3"
