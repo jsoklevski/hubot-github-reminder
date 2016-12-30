@@ -123,6 +123,10 @@ class GithubBot
       Utils.saveGithubUser hubotUser, github_user
       @send msg, " #{hubotUser} saved as #{github_user}"
 
+    @robot.hear /(?:github|gh|git) Init cache/i, (msg) =>
+      @cacheRefresh.initializeCache()
+      @send msg, " Cache initialized"
+
     @robot.respond /(?:github|gh|git) delete all reminders/i, (msg) =>
       hubotUser = msg.message.user.name
       remindersCleared = @reminders.clearAllForUser hubotUser

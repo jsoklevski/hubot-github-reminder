@@ -40,19 +40,19 @@ class PullRequests
       Utils.robot.logger.error error
       Promise.reject error
     .then (results)->
-      processRepos results
+      _processRepos results
     .catch (error) ->
       Utils.robot.logger.error "1"
       Utils.robot.logger.error error
       Promise.reject error
     .then (pullRequestObjects) ->
-      cacheStuff pullRequestObjects
+      _cacheStuff pullRequestObjects
     .catch ( error ) ->
       Utils.robot.logger.error "2"
       Utils.robot.logger.error error
       Promise.reject error
 
-  cacheStuff= (pullRequestObjects) ->
+  _cacheStuff= (pullRequestObjects) ->
     cacheResult = []
     for repo in pullRequestObjects
       for p in repo when p
@@ -60,7 +60,7 @@ class PullRequests
     @robot.brain.set @key, cacheResult
     @robot.logger.info "Cache Saved key used: #{@key}"
 
-  processRepos= (results) ->
+  _processRepos= (results) ->
     return Promise.all results.map (currentRepo) ->
       repo = octo.repos(Config.github.organization, currentRepo.name)
       repo.pulls.fetch(state: "open")
@@ -70,7 +70,7 @@ class PullRequests
           repo.pulls(pr.number).fetch()
           .then (fetchedPullRequest) ->
             @robot.logger.info "2 PR #{pr.number} repo name #{currentRepo.name}"
-            formatPullRequest fetchedPullRequest, currentRepo.name
+            _formatPullRequest fetchedPullRequest, currentRepo.name
           .catch (error) ->
             Utils.robot.logger.error "3"
             Utils.robot.logger.error error
@@ -81,7 +81,7 @@ class PullRequests
         Promise.reject error
 
 
-  formatPullRequest= (fetchedPullRequest, repoName) ->
+  _formatPullRequest= (fetchedPullRequest, repoName) ->
     assigneesList = []
     fetchedPullRequest.assignees.map (assignee) ->
       assigneesList.push(assignee.login)
