@@ -16,14 +16,11 @@ class GitHubDataService
         for assignee in pr.assignenes when assignee
           if assignee == githubUserName then pullRequestsForUser.push new PullRequest pr githubUserName
 
-    if pullRequestsForUser.length != 0
-      Utils.robot.emit "GithubPullRequestsOpenForUser", pullRequestsForUser, githubUserName
-      return
-    else
-      throw  new Error "No open PR for this user"
+
+    Utils.robot.emit "GithubPullRequestsOpenForUser", pullRequestsForUser, githubUserName
 
   @updatePullRequestsCache: (pullRequest) ->
-    pullrequestsCachedData = Utils.robot.brain.get(githubPullRequestsData)
+    pullrequestsCachedData = Utils.robot.brain.get("github-pr-cache")
 
     assigneesList = []
     pullRequest.assignees.map (assignee) ->
@@ -49,7 +46,7 @@ class GitHubDataService
 
     pullrequestsCached.push pullRequestObject
 
-    Utils.robot.brain.set githubPullRequestsData, pullrequestsCached
+    Utils.robot.brain.set "github-pr-cache", pullrequestsCached
 
 
 module.exports = GitHubDataService

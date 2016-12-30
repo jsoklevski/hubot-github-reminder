@@ -19,13 +19,22 @@ class PullRequests
 
   _clearCache: ->
     @robot.logger.info "clear Cache"
+    @robot.brain.set "cache-initialized", false
     @_getAllOpenPullRequestsForAllRepose()
+
+    setTimeout ->
+      if !(@robot.brain.get "cache-initialized")
+        @robot.logger.info 'Rerun Cache Initialization!'
+        @_clearCache
+    , 5000
+
 
   initializeCache: ->
     @robot.logger.info "init Cache"
     @_getAllOpenPullRequestsForAllRepose()
 
   _getAllOpenPullRequestsForAllRepose: ->
+    @robot.logger.info "Reinitialize Cache"
     org = octo.orgs(Config.github.organization)
     org.repos.fetch()
     .then (page) ->
@@ -58,6 +67,7 @@ class PullRequests
       for p in repo when p
         cacheResult.push p
     @robot.brain.set "github-pr-cache", cacheResult
+    @robot.brain.set "cache-initialized", true
     @robot.logger.info "Cache Saved key used: github-pr-cache"
 
   _processRepos= (results) ->
