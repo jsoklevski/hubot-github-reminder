@@ -181,7 +181,9 @@ class GithubBot
 
       @robot.logger.info "Get PR for  #{who}"
       githubUserName = Utils.lookupUserWithHubot who
-      Github.GitHubDataService.openForUser(githubUserName)
-      .catch (e) => @send msg, e
-
+      if githubUserName
+        Github.GitHubDataService.openForUser(githubUserName)
+          .catch (e) => @send msg, e
+      else
+        @send msg, "Please first provide your githubusername using  I am  command "
   module.exports = GithubBot
