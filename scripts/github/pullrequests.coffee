@@ -23,9 +23,9 @@ class PullRequests
     @_getAllOpenPullRequestsForAllRepose()
 
     setTimeout ->
-      if !(@robot.brain.get "cache-initialized")
-        @robot.logger.info 'Rerun Cache Initialization!'
-        @_clearCache
+      if !(robot.brain.get "cache-initialized")
+        robot.logger.info 'Rerun Cache Initialization!'
+        @_clearCache()
     , 5000
 
 
