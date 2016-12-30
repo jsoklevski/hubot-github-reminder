@@ -35,6 +35,10 @@ class PullRequests
         if pageResults.nextPage == undefined then return results;
         return pageResults.nextPage().then(handlePage);
       handlePage(page)
+    .catch (error) ->
+      Utils.robot.logger.error "0"
+      Utils.robot.logger.error error
+      Promise.reject error
     .then (results)->
       processRepos results
     .catch (error) ->
