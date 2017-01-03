@@ -25,8 +25,8 @@ class PullRequests
     setTimeout ->
       if !(robot.brain.get "cache-initialized")
         robot.logger.info 'Rerun Cache Initialization!'
-        @_clearCache()
-    , 5000
+        _clearCache()
+    , 6000
 
 
   initializeCache: ->
