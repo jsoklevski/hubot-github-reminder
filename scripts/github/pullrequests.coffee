@@ -18,14 +18,15 @@ class PullRequests
       new cronJob('00 00 4 * * *', @_clearCache.bind(@), null, true, null, null, true)
 
   _clearCache: ->
+    self = @
     @robot.logger.info "clear Cache"
     @robot.brain.set "cache-initialized", false
     @_getAllOpenPullRequestsForAllRepose()
 
     setTimeout ->
-      if !(robot.brain.get "cache-initialized")
-        robot.logger.info 'Rerun Cache Initialization!'
-        _clearCache()
+      if !(self.robot.brain.get "cache-initialized")
+        self.robot.logger.info 'Rerun Cache Initialization!'
+        self.clearCache()
     , 6000
 
 
