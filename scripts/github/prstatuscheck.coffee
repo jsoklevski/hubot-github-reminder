@@ -1,6 +1,7 @@
 _ = require 'underscore'
 Utils = require  "../utils"
 cronJob = require("cron").CronJob
+Config = require "../config"
 Octokat = require 'octokat'
 
 octo = new Octokat

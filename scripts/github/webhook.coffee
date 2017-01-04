@@ -1,15 +1,8 @@
 Config = require "../config"
-Octokat = require "octokat"
-Utils = require "../utils"
-PullRequest = require "./pullrequest"
-GithubService = require "./P"
+GithubService = require "./githubdataservice"
 
 url = require "url"
 crypto = require "crypto"
-
-octo = new Octokat
-  token: Config.github.token
-  rootUrl: Config.github.url
 
 class Webhook
   constructor: (@robot, @prStatusChecks) ->
@@ -31,7 +24,7 @@ class Webhook
 
   onPullRequest: (event) ->
 
-    GithubService.updatePullRequestsCacheevent event.pull_request
+    GithubService.updatePullRequestsCache event.pull_request
 
     return unless event.action is "assigned"
     return unless event.assignee?.url?

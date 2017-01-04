@@ -32,7 +32,6 @@
 
 _ = require 'underscore'
 Adapters = require "./adapters"
-Config = require "./config"
 Github = require "./github"
 Reminders = require "./reminders"
 Utils = require "./utils"
@@ -82,7 +81,7 @@ class GithubBot
     @robot.on "GithubPullRequestsOpenForUser", (prs, user) =>
       @robot.logger.debug "Sending Pulls Requests #{user}"
       if prs.length is 0
-        message = text: "No matching pull requests found"
+        message = text: "No open pull requests found"
       else
         attachments = (pr.toAttachment() for pr in prs)
         message = attachments: attachments
@@ -90,10 +89,10 @@ class GithubBot
 
     @robot.on "NoGithubUserProvided", (user) =>
       @robot.logger.debug "Sending Warning Message to #{user.name}"
-      message = text: """
-                       Warining: No Github Username provived, i will use slack username, please provide github username if different using #{@robot.name} github I am <user>
-                      """
-      @adapter.dm user, message
+      @adapter.dm user,
+        text: """
+          Warining: No Github Username provived, i will use slack username, please provide github username if different using #{@robot.name} github I am <user>
+        """
   registerRobotResponses: ->
 
     @robot.respond /(?:github|gh|git) (allow|start|enable|disallow|disable|stop)( notifications)?/i, (msg) =>
@@ -153,7 +152,7 @@ class GithubBot
       [__, time] = msg.match
       hubotUser = msg.message.user.name
       githubUserName = Utils.lookupUserWithHubot hubotUser
-        @reminders.save hubotUser, time
+      @reminders.save hubotUser, time
       if githubUserName
         @send msg, "Ok, from now on I'll remind this room about open pull requests every weekday at #{time}"
       else
@@ -173,7 +172,7 @@ class GithubBot
 
     @robot.respond /(github|gh|git) help/i, (msg) =>
       @send msg, """
-        I can remind you about open pull requests for the repo that belongs to this channel
+        I can remind you about open pull requests for the assigned to you
         Use me to create a reminder, and then I'll post in this room every weekday at the time you specify. Here's how:
 
         #{@robot.name} github list open pr - Shows a list of open pull requests assigned to the current user
@@ -190,6 +189,5 @@ class GithubBot
 
       @robot.logger.info "Get PR for  #{hubotUser.name}"
       Github.GitHubDataService.openForUser hubotUser
-      .catch (e) => @send msg, e
 
   module.exports = GithubBot

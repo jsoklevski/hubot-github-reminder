@@ -30,7 +30,7 @@ class PullRequest
       short: yes
     ,
       title: "Assignees"
-      value: if @assignees then "<@#{@assignees}>" else "Unassigned"
+      value: if @assignees then "<@#{@assignees}>" else "<@#{@assignee}>"
       short: yes
     ,
       title: "Lines"
@@ -46,7 +46,7 @@ class PullRequest
       Updated: *#{moment(@updatedAt).fromNow()}*
       Status: #{if @mergeable then "Mergeable" else "Unresolved Conflicts"}
       Author: #{@author}
-      Assignee: #{if @assignees then "#{@assignees}" else "Unassigned"}
+      Assignee: #{if @assignees then "#{@assignees}" else "<@#{@assignee}>"}
     """
 
 module.exports = PullRequest

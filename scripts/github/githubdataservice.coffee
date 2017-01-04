@@ -9,7 +9,7 @@ class GitHubDataService
   @openForUser: (hubotUsername) ->
     pullrequestsData = Utils.robot.brain.get("github-pr-cache")
 
-    githubUsername = Util.lookupUserWithHubot hubotUsername
+    githubUserName = Utils.lookupUserWithHubot hubotUsername
 
     if !githubUsername
       githubUsername = hubotUsername.name
@@ -19,7 +19,7 @@ class GitHubDataService
 
     if pullrequestsData != null
       for pr in pullrequestsData
-        for assignee in pr.assignenes when assignee
+        for assignee in pr.assignees when assignee
           if assignee == githubUserName then pullRequestsForUser.push new PullRequest pr githubUserName
 
 
