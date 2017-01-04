@@ -6,8 +6,14 @@ PullRequest = require "./pullrequest"
 class GitHubDataService
 
 
-  @openForUser: (githubUserName) ->
+  @openForUser: (hubotUsername) ->
     pullrequestsData = Utils.robot.brain.get("github-pr-cache")
+
+    githubUsername = Util.lookupUserWithHubot hubotUsername
+
+    if !githubUsername
+      githubUsername = hubotUsername.name
+      Utils.robot.emit "GithubPullRequestsOpenForUser", hubotUsername
 
     pullRequestsForUser = []
 
@@ -17,7 +23,7 @@ class GitHubDataService
           if assignee == githubUserName then pullRequestsForUser.push new PullRequest pr githubUserName
 
 
-    Utils.robot.emit "GithubPullRequestsOpenForUser", pullRequestsForUser, githubUserName
+    Utils.robot.emit "GithubPullRequestsOpenForUser", pullRequestsForUser, hubotUsername
 
   @updatePullRequestsCache: (pullRequest) ->
     pullrequestsCachedData = Utils.robot.brain.get("github-pr-cache")
@@ -36,7 +42,7 @@ class GitHubDataService
       mergable: pullRequest.mergeable
       additions: pullRequest.additions
       deletions: pullRequest.deletions
-      assignenes : assigneesList
+      assignees : assigneesList
       repo : pullRequest.repo.name
     }
 

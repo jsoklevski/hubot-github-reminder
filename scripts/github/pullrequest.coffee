@@ -17,7 +17,7 @@ class PullRequest
 
   toAttachment: ->
     color: "#ff9933"
-    author_name: @user.login
+    author_name: @author
     title: @title
     title_link: url
     fields: [
@@ -30,19 +30,23 @@ class PullRequest
       short: yes
     ,
       title: "Assignees"
-      value: if @assignee then "<@#{@assignee}>" else "Unassigned"
+      value: if @assignees then "<@#{@assignees}>" else "Unassigned"
       short: yes
     ,
       title: "Lines"
       value: "+#{@additions} -#{@deletions}"
+      short: yes
+    ,
+      title: "Status Checks"
+      value: if @statusChecks then "<@#{@statusChecks}>"
       short: yes
     ]
     fallback: """
       *#{@title}* +#{@additions} -#{@deletions}
       Updated: *#{moment(@updatedAt).fromNow()}*
       Status: #{if @mergeable then "Mergeable" else "Unresolved Conflicts"}
-      Author: #{@user.login}
-      Assignee: #{if @assignee then "#{@assignee.name}" else "Unassigned"}
+      Author: #{@author}
+      Assignee: #{if @assignees then "#{@assignees}" else "Unassigned"}
     """
 
 module.exports = PullRequest

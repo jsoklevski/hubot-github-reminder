@@ -15,19 +15,12 @@ class PullRequests
   constructor: (@robot) ->
     @robot.brain.once 'loaded', =>
       # Run a cron job that runs every day at 4:00 am
-      new cronJob('00 00 4 * * *', @_clearCache.bind(@), null, true, null, null, true)
+      new cronJob('0 0 4 * * *', @_clearCache.bind(@), null, true, null, null, true)
 
   _clearCache: ->
-    self = @
     @robot.logger.info "clear Cache"
-    @robot.brain.set "cache-initialized", false
     @_getAllOpenPullRequestsForAllRepose()
 
-    setTimeout ->
-      if !(self.robot.brain.get "cache-initialized")
-        self.robot.logger.info 'Rerun Cache Initialization!'
-        self.clearCache()
-    , 6000
 
 
   initializeCache: ->
@@ -56,19 +49,18 @@ class PullRequests
       Utils.robot.logger.error error
       Promise.reject error
     .then (pullRequestObjects) ->
-      _cacheStuff pullRequestObjects
+      _cachePullRequests pullRequestObjects
     .catch ( error ) ->
       Utils.robot.logger.error "2"
       Utils.robot.logger.error error
       Promise.reject error
 
-  _cacheStuff= (pullRequestObjects) ->
+  _cachePullRequests= (pullRequestObjects) ->
     cacheResult = []
     for repo in pullRequestObjects
       for p in repo when p
         cacheResult.push p
     @robot.brain.set "github-pr-cache", cacheResult
-    @robot.brain.set "cache-initialized", true
     @robot.logger.info "Cache Saved key used: github-pr-cache"
 
   _processRepos= (results) ->
@@ -102,10 +94,10 @@ class PullRequests
       title : fetchedPullRequest.title
       author : fetchedPullRequest.user.login
       updatedAt : fetchedPullRequest.updatedAt
-      mergable: fetchedPullRequest.mergeable
+      mergeable: fetchedPullRequest.mergeable
       additions: fetchedPullRequest.additions
       deletions: fetchedPullRequest.deletions
-      assignenes : assigneesList
+      assignees : assigneesList
       repo : repoName
     }
     return pullRequestObject

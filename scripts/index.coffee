@@ -42,14 +42,14 @@ class GithubBot
   constructor: (@robot) ->
     return new GithubBot @robot unless @ instanceof GithubBot
     Utils.robot = @robot
-    @reminders = new Reminders @robot, "github-reminders", (hubotUsername) ->
-      githubUserName Utils.lookupUserWithHubot hubotUsername
-      Github.GitHubDataService.openForUser githubUserName
+    @reminders = new Reminders @robot, "github-reminders", (hubotUser) ->
+      hubotUserObject = Utils.findUser hubotUser
+      Github.GitHubDataService.openForUser hubotUserObject
 
-    @robot.logger.info "Cache Init"
+    @prStatusChecks = new Github.PrStatusCheck @robot
     @cacheRefresh = new Github.PullRequests @robot
 
-    @webhook = new Github.Webhook @robot
+    @webhook = new Github.Webhook @robot, @prStatusChecks
     switch @robot.adapterName
       when "slack"
         @adapter = new Adapters.Slack @robot
@@ -70,12 +70,11 @@ class GithubBot
     """
 
     @robot.on "GithubPullRequestAssigned", (pr, sender) =>
-      @robot.logger.debug "Sending PR assignment notice to #{pr.assignee}, sender is #{sender}"
-      @adapter.dm pr.assignee,
+      @robot.logger.debug "Sending PR assignment notice to #{pr.assignee}"
+      @adapter.dm sender,
         text: """
           You have just been assigned to a pull request
         """
-        author: sender
         footer: disableDisclaimer
         attachments: [ pr.toAttachment() ]
 
@@ -89,6 +88,12 @@ class GithubBot
         message = attachments: attachments
       @adapter.dm user, message
 
+    @robot.on "NoGithubUserProvided", (user) =>
+      @robot.logger.debug "Sending Warning Message to #{user.name}"
+      message = text: """
+                       Warining: No Github Username provived, i will use slack username, please provide github username if different using #{@robot.name} github I am <user>
+                      """
+      @adapter.dm user, message
   registerRobotResponses: ->
 
     @robot.respond /(?:github|gh|git) (allow|start|enable|disallow|disable|stop)( notifications)?/i, (msg) =>
@@ -148,11 +153,15 @@ class GithubBot
       [__, time] = msg.match
       hubotUser = msg.message.user.name
       githubUserName = Utils.lookupUserWithHubot hubotUser
-      if githubUserName
         @reminders.save hubotUser, time
+      if githubUserName
         @send msg, "Ok, from now on I'll remind this room about open pull requests every weekday at #{time}"
       else
-        @send msg, "Please first provide your githubusername using  I am  command "
+        @send msg, """
+          Please first provide your github username if it is different than hubot username
+          #{@robot.name} github I am <user> - Provides the github username for the given slack user
+          From now on I'll remind this room about open pull requests every weekday at #{time}
+        """
 
     @robot.respond /(?:github|gh|git) list reminders$/i, (msg) =>
       hubotUser = msg.message.user.name
@@ -167,7 +176,7 @@ class GithubBot
         I can remind you about open pull requests for the repo that belongs to this channel
         Use me to create a reminder, and then I'll post in this room every weekday at the time you specify. Here's how:
 
-        #{@robot.name} github open [for <user>] - Shows a list of open pull requests for the repo of this room [optionally for a specific user]
+        #{@robot.name} github list open pr - Shows a list of open pull requests assigned to the current user
         #{@robot.name} github reminder hh:mm - I'll remind about open pull requests in this room at hh:mm every weekday.
         #{@robot.name} github list reminders - See all pull request reminders for this room.
         #{@robot.name} github delete hh:mm reminder - If you have a reminder at hh:mm, I'll delete it.
@@ -176,14 +185,11 @@ class GithubBot
         #{@robot.name} github Init cache - Reinitializes cache
       """
 
-    @robot.respond /(?:github|gh|git) (?:prs|open)(?:\s+(?:for|by)\s+(?:@?)(.*))?/i, (msg) =>
-      [__, who] = msg.match
+    @robot.respond /(?:github|gh|git) list open pr/i, (msg) =>
+      hubotUser = msg.message.user
 
-      @robot.logger.info "Get PR for  #{who}"
-      githubUserName = Utils.lookupUserWithHubot who
-      if githubUserName
-        Github.GitHubDataService.openForUser(githubUserName)
-          .catch (e) => @send msg, e
-      else
-        @send msg, "Please first provide your githubusername using  I am  command "
+      @robot.logger.info "Get PR for  #{hubotUser.name}"
+      Github.GitHubDataService.openForUser hubotUser
+      .catch (e) => @send msg, e
+
   module.exports = GithubBot
