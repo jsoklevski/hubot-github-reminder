@@ -12,11 +12,10 @@ class PrStatusCheck
 
 
   constructor: (@robot) ->
-    @robot.brain.once 'loaded', =>
-      # Run a cron job that runs every 5 minutes, Monday-Friday
-      new cronJob('0 */5 * * * *', @_check.bind(@), null, true)
+  @robot.brain.once 'loaded', =>
+  # Run a cron job that runs every 5 minutes, Monday-Friday
+  new cronJob('0 */5 * * * *', @_check.bind(@), null, true)
 
-  key = "pr-status-checks"
 
   processStatuses = (checks) ->
     checksMap = {}
@@ -43,10 +42,10 @@ class PrStatusCheck
     return statusResult
 
   _get: ->
-    @robot.brain.get(key) or []
+    @robot.brain.get("pr-status-checks") or []
 
   _save: (reminders) ->
-    @robot.brain.set key, reminders
+    @robot.brain.set "pr-status-checks", reminders
 
   _check: ->
     reminders = @_get()
@@ -61,11 +60,12 @@ class PrStatusCheck
           if !statusResult.pendingChecks
             @_clearStatusCheck(reminder.pr, reminder.repoName)
             pullRequestObject = @_formatPullRequest pr, reminder.repoName, statusResult
-            user = Utils.lookupUserWithGithub(event.assignee.login)
-            if !user
-              @robot.logger.error "No mapped user for github user" + event.assignee.login
-              return
-            @robot.emit "GithubPullRequestAssigned", pullRequestObject, user
+            pr.assignees.map (assignee) ->
+              user = Utils.lookupUserWithGithub(assignee.login)
+              if !user
+                @robot.logger.error "No mapped user for github user" + assignee.login
+                continue
+              @robot.emit "GithubPullRequestAssigned", pullRequestObject, user
 
   _formatPullRequest= (fetchedPullRequest, repoName, statusChecks) ->
     assigneesList = []
