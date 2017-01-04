@@ -64,8 +64,8 @@ class PrStatusCheck
               user = Utils.lookupUserWithGithub(assignee.login)
               if !user
                 @robot.logger.error "No mapped user for github user" + assignee.login
-                continue
-              @robot.emit "GithubPullRequestAssigned", pullRequestObject, user
+              else
+                @robot.emit "GithubPullRequestAssigned", pullRequestObject, user
 
   _formatPullRequest= (fetchedPullRequest, repoName, statusChecks) ->
     assigneesList = []
