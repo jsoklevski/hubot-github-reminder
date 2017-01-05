@@ -10,11 +10,10 @@ octo = new Octokat
 
 class PrStatusCheck
 
-
   constructor: (@robot) ->
-  @robot.brain.once 'loaded', =>
-  # Run a cron job that runs every 5 minutes, Monday-Friday
-  new cronJob('0 */5 * * * *', @_check.bind(@), null, true)
+    @robot.brain.once 'loaded', =>
+      # Run a cron job that runs every 5 minutes, Monday-Friday
+      new cronJob('0 */5 * * * *', @_check.bind(@), null, true)
 
 
   processStatuses = (checks) ->
@@ -49,7 +48,7 @@ class PrStatusCheck
 
   _check: ->
     reminders = @_get()
-    reminders.map() (reminder) ->
+    _.chain reminders, (reminder) ->
       repo = octo.repos(Config.github.organization, reminder.repoName)
       repo.pulls(reminder.pr).fetch()
       .then (pr) ->
