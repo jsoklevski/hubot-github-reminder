@@ -1,5 +1,4 @@
 _ = require 'underscore'
-moment = require 'moment'
 cronJob = require("cron").CronJob
 
 class Reminders

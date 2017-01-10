@@ -1,33 +1,26 @@
-_ = require "underscore"
-
 Octokat = require "octokat"
 Config = require "../config"
 Utils = require "../utils"
 Promise = require "promise"
-cronJob = require("cron").CronJob
+CronJob = require("cron").CronJob
 
 octo = new Octokat
   token: Config.github.token
   rootUrl: Config.github.url
 
-class PullRequests
+class PullRequestsCacheInit
+  @GITHUB_PULL_REQUESTS_CACHE: "github-pr-cache"
 
   constructor: (@robot) ->
     @robot.brain.once 'loaded', =>
       # Run a cron job that runs every day at 4:00 am
-      new cronJob('0 0 4 * * *', @_clearCache.bind(@), null, true, null, null, true)
+      new CronJob('0 0 4 * * *', @clearCache.bind(@), null, true, null, null, true)
 
-  _clearCache: ->
-    @robot.logger.info "clear Cache"
-    @_getAllOpenPullRequestsForAllRepose()
-
-
-
-  initializeCache: ->
+  clearCache: ->
     @robot.logger.info "init Cache"
-    @_getAllOpenPullRequestsForAllRepose()
+    @getAllOpenPullRequestsForAllRepose()
 
-  _getAllOpenPullRequestsForAllRepose: ->
+  getAllOpenPullRequestsForAllRepose= ->
     @robot.logger.info "Reinitialize Cache"
     org = octo.orgs(Config.github.organization)
     org.repos.fetch()
@@ -39,31 +32,28 @@ class PullRequests
         return pageResults.nextPage().then(handlePage);
       handlePage(page)
     .catch (error) ->
-      Utils.robot.logger.error "0"
       Utils.robot.logger.error error
       Promise.reject error
     .then (results)->
-      _processRepos results
+      processRepos results
     .catch (error) ->
-      Utils.robot.logger.error "1"
       Utils.robot.logger.error error
       Promise.reject error
     .then (pullRequestObjects) ->
-      _cachePullRequests pullRequestObjects
+      cachePullRequests pullRequestObjects
     .catch ( error ) ->
-      Utils.robot.logger.error "2"
       Utils.robot.logger.error error
       Promise.reject error
 
-  _cachePullRequests= (pullRequestObjects) ->
+  cachePullRequests= (pullRequestObjects) ->
     cacheResult = []
     for repo in pullRequestObjects
       for p in repo when p
         cacheResult.push p
-    @robot.brain.set "github-pr-cache", cacheResult
+    @robot.brain.set PullRequestsCacheInit.GITHUB_PULL_REQUESTS_CACHE, cacheResult
     @robot.logger.info "Cache Saved key used: github-pr-cache"
 
-  _processRepos= (results) ->
+  processRepos= (results) ->
     return Promise.all results.map (currentRepo) ->
       repo = octo.repos(Config.github.organization, currentRepo.name)
       repo.pulls.fetch(state: "open")
@@ -71,18 +61,16 @@ class PullRequests
         return Promise.all json.map (pr) ->
           repo.pulls(pr.number).fetch()
           .then (fetchedPullRequest) ->
-            _formatPullRequest fetchedPullRequest, currentRepo.name
+            formatPullRequest fetchedPullRequest, currentRepo.name
           .catch (error) ->
-            Utils.robot.logger.error "3"
             Utils.robot.logger.error error
             Promise.reject error
       .catch (error) ->
-        Utils.robot.logger.error "4"
         Utils.robot.logger.error error
         Promise.reject error
 
 
-  _formatPullRequest= (fetchedPullRequest, repoName) ->
+  formatPullRequest= (fetchedPullRequest, repoName) ->
     assigneesList = []
     fetchedPullRequest.assignees.map (assignee) ->
       assigneesList.push(assignee.login)
@@ -102,4 +90,4 @@ class PullRequests
     }
     return pullRequestObject
 
-module.exports = PullRequests
+module.exports = PullRequestsCacheInit

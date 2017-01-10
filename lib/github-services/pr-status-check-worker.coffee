@@ -8,15 +8,45 @@ octo = new Octokat
   token: Config.github.token
   rootUrl: Config.github.url
 
-class PrStatusCheck
+# Class containing logic for checking status updates once a pr has been assigned
+
+class PrStatusCheckWorker
+
+  @GITHUB_PULL_REQUESTS_CACHE: "pr-status-checks"
 
   constructor: (@robot) ->
     @robot.brain.once 'loaded', =>
-      # Run a cron job that runs every 5 minutes, Monday-Friday
-      new cronJob('0 */5 * * * *', @_check.bind(@), null, true)
+      # Run a cron job that runs every 5 minutes
+      new cronJob('0 */5 * * * *', @check.bind(@), null, true)
+
+  _get: ->
+    @robot.brain.get(PrStatusCheck.GITHUB_PULL_REQUESTS_CACHE) or []
+
+  _save: (reminders) ->
+    @robot.brain.set PrStatusCheck.GITHUB_PULL_REQUESTS_CACHE, reminders
+
+  check: ->
+    # get all recently assigned prs which might have a status update
+    reminders = @_get()
+    _.chain reminders, (reminder) ->
+      repo = octo.repos(Config.github.organization, reminder.repoName)
+      repo.pulls(reminder.pr).fetch()
+      .then (pr) ->
+        octo.fromUrl(pr.Links.statuses.href).fetch()
+        .then (checks) ->
+          statusResult = processStatuses(checks)
+          if !statusResult.pendingChecks
+            @_clearStatusCheck(reminder.pr, reminder.repoName)
+            pullRequestObject = @formatPullRequest pr, reminder.repoName, statusResult
+            pr.assignees.map (assignee) ->
+              user = Utils.lookupUserWithGithub(assignee.login)
+              if !user
+                @robot.logger.error "No mapped user for github user" + assignee.login
+              else
+                @robot.emit "GithubPullRequestAssigned", pullRequestObject, user
 
 
-  processStatuses = (checks) ->
+  processStatuses= (checks) ->
     checksMap = {}
     checks.map (check) ->
       if !checksMap[check.context]
@@ -40,33 +70,7 @@ class PrStatusCheck
     }
     return statusResult
 
-  _get: ->
-    @robot.brain.get("pr-status-checks") or []
-
-  _save: (reminders) ->
-    @robot.brain.set "pr-status-checks", reminders
-
-  _check: ->
-    reminders = @_get()
-    _.chain reminders, (reminder) ->
-      repo = octo.repos(Config.github.organization, reminder.repoName)
-      repo.pulls(reminder.pr).fetch()
-      .then (pr) ->
-        octo.fromUrl(pr.Links.statuses.href).fetch()
-        .then (checks) ->
-          statusResult = processStatuses(checks)
-
-          if !statusResult.pendingChecks
-            @_clearStatusCheck(reminder.pr, reminder.repoName)
-            pullRequestObject = @_formatPullRequest pr, reminder.repoName, statusResult
-            pr.assignees.map (assignee) ->
-              user = Utils.lookupUserWithGithub(assignee.login)
-              if !user
-                @robot.logger.error "No mapped user for github user" + assignee.login
-              else
-                @robot.emit "GithubPullRequestAssigned", pullRequestObject, user
-
-  _formatPullRequest= (fetchedPullRequest, repoName, statusChecks) ->
+  formatPullRequest= (fetchedPullRequest, repoName, statusChecks) ->
     assigneesList = []
     fetchedPullRequest.assignees.map (assignee) ->
       assigneesList.push(assignee.login)
@@ -108,4 +112,4 @@ class PrStatusCheck
     reminders.length - (remindersToKeep.length)
 
 
-module.exports = PrStatusCheck
+module.exports = PrStatusCheckWorker

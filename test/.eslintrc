@@ -1,0 +1,14 @@
+---
+  env:
+    # Adds all of the Mocha testing global variables
+    mocha: true
+
+  rules:
+
+    # Allow `(function() { fn(); }).should.throw();`
+    no-wrap-func: 0
+
+    # Warn when using "magic" getters `val.should.be.a.String;`
+    # Instead use the `code` module or `val.should.have.type('string');`
+    # TODO: Remove this rule when tests have been changed.
+    no-unused-expressions: 1

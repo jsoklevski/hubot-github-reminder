@@ -5,12 +5,6 @@ class Utils
   @robot: null
   brain_users_key = 'githubUserIdsByHubotUsername'
 
-  @findRoom: (msg) ->
-    room = msg.envelope.room
-    if _.isUndefined(room)
-      room = msg.envelope.user.reply_to
-    room
-
   @saveGithubUser: (hubot_user, github_user) ->
     user_ids_by_username = Utils.robot.brain.get(brain_users_key)
     if !user_ids_by_username

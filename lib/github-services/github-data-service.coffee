@@ -1,13 +1,14 @@
 _ = require "underscore"
 Utils = require "../utils"
-PullRequest = require "./pullrequest"
+PullRequestObject = require "./pr-object"
 
 
 class GitHubDataService
 
+  @GITHUB_PULL_REQUESTS_CACHE: "github-pr-cache"
 
   @openForUser: (hubotUsername) ->
-    pullrequestsData = Utils.robot.brain.get("github-pr-cache")
+    pullrequestsData = Utils.robot.brain.get(GitHubDataService.GITHUB_PULL_REQUESTS_CACHE)
 
     githubUserName = Utils.lookupUserWithHubot hubotUsername
 
@@ -20,13 +21,13 @@ class GitHubDataService
     if pullrequestsData != null
       for pr in pullrequestsData
         for assignee in pr.assignees when assignee
-          if assignee == githubUserName then pullRequestsForUser.push new PullRequest pr githubUserName
+          if assignee == githubUserName then pullRequestsForUser.push new PullRequestObject pr githubUserName
 
 
     Utils.robot.emit "GithubPullRequestsOpenForUser", pullRequestsForUser, hubotUsername
 
   @updatePullRequestsCache: (pullRequest) ->
-    pullrequestsCachedData = Utils.robot.brain.get("github-pr-cache")
+    pullrequestsCachedData = Utils.robot.brain.get(GitHubDataService.GITHUB_PULL_REQUESTS_CACHE)
 
     assigneesList = []
     pullRequest.assignees.map (assignee) ->
@@ -39,7 +40,7 @@ class GitHubDataService
       title : pullRequest.title
       author : pullRequest.user.login
       updatedAt : pullRequest.updatedAt
-      mergable: pullRequest.mergeable
+      mergeable: pullRequest.mergeable
       additions: pullRequest.additions
       deletions: pullRequest.deletions
       assignees : assigneesList
@@ -52,7 +53,7 @@ class GitHubDataService
 
     pullrequestsCached.push pullRequestObject
 
-    Utils.robot.brain.set "github-pr-cache", pullrequestsCached
+    Utils.robot.brain.set GitHubDataService.GITHUB_PULL_REQUESTS_CACHE, pullrequestsCached
 
 
 module.exports = GitHubDataService

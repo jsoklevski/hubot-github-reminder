@@ -1,0 +1,4 @@
+--strict
+--max_line_length=100
+--disable=0002, 0006
+--exclude_directories='.idea, coverage, node_modules, scripts'
