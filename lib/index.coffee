@@ -1,7 +1,7 @@
 # Description:
 # A hubot script to list and recurrently remind you about open pull requests.
 # Optionally receive direct messages when you are assigned to a pull
-# request in your organization or for a specific repo or set of repos.
+# request in your organization.
 #
 # Dependencies:
 #  - coffeescript
@@ -14,7 +14,6 @@
 # Configuration:
 #   HUBOT_GITHUB_TOKEN - Github Application Token
 #   HUBOT_GITHUB_WEBHOOK_SECRET - Optional, if you are using webhooks and have a secret set this for additional security checks on payload delivery
-#   HUBOT_GITHUB_URL - Set this value if you are using Github Enterprise   default: `https://api.github.com`
 #   HUBOT_GITHUB_ORG - Github Organization Name (the one in the url)
 #
 # Commands:
@@ -25,11 +24,11 @@
 #   hubot github delete all reminders - Deletes all reminders for this room.
 #
 # Author:
-#   ndaversa
+#   Springworks
 
 
 _ = require 'underscore'
-Adapters = require "./hubot-message-adapters"
+Generic = require "./hubot-message-adapters/generic"
 Patterns = require "./patterns"
 GitHubDataService = require "./github-services/github-data-service"
 PrCacheInitializer = require("./github-services/pr-cache-initializer").PullRequestsCacheInit
@@ -43,16 +42,12 @@ class GithubBot
     return new GithubBot @robot unless @ instanceof GithubBot
     @reminders = new Reminders @robot, (hubotUser) ->
       hubotUserObject = utils.findUser @robot, hubotUser
-      GitHubDataService.openForUser @robot.brain, hubotUserObject
+      GitHubDataService.openForUser @robot.brain, hubotUserObject, false
 
     @cacheRefresh = new PrCacheInitializer @robot
     @webhook = new GithubWebhookHandler @robot
 
-    switch @robot.adapterName
-      when "slack"
-        @adapter = new Adapters.Slack @robot
-      else
-        @adapter = new Adapters.Generic @robot
+    @adapter = new Generic @robot
 
     @registerWebhookListeners()
     @registerEventListeners()
@@ -175,6 +170,7 @@ class GithubBot
         Use me to create a reminder, and then I'll post in this room every weekday at the time you specify. Here's how:
 
         github list open pr - Shows a list of open pull requests assigned to the current user
+        github list my open pr - Show a list of open PRs that the current user created
         github remind hh:mm - I'll remind about open pull requests in this room at hh:mm every weekday.
         github list reminders - See all pull request reminders for this room.
         github delete hh:mm reminder - If you have a reminder at hh:mm, I'll delete it.
@@ -187,6 +183,14 @@ class GithubBot
       hubotUser = msg.message.user
 
       @robot.logger.debug "Get PR for  #{hubotUser.name}"
-      GitHubDataService.openForUser @robot, hubotUser
+      GitHubDataService.openForUser @robot, hubotUser, false
+
+
+    @robot.respond Patterns.LIST_MY_OPEN_PR, (msg) =>
+      hubotUser = msg.message.user
+
+      @robot.logger.debug "Get PR for  #{hubotUser.name}"
+      GitHubDataService.openForUser @robot, hubotUser, true
+
 
   module.exports = GithubBot

@@ -1,6 +1,8 @@
 'use strict';
+var internals = {
 
-exports.mockRobotBrain = function() {
+};
+internals.mockRobotBrain = function() {
   var brain = {};
   return {
     get: function(key) {
@@ -8,6 +10,45 @@ exports.mockRobotBrain = function() {
     },
     set: function(key, val) {
       brain[key] = val;
+    },
+    once: function(when, callback) {
+      setTimeout(callback, 1000);
+    },
+    users: function() {
+      return [{
+        name: 'test',
+        id: 'test',
+        real_name: 'test'
+      },
+        {
+          name: 'test123',
+          id: 'test123',
+          real_name: 'test123'
+        }];
+    }
+  };
+};
+
+exports.mockRobot = function () {
+  return {
+    brain: internals.mockRobotBrain(),
+
+    logger: {
+        info: function(expression) {
+          console.log(expression);
+        },
+        error: function(expression) {
+          console.log(expression);
+        },
+        debug: function(expression) {
+          console.log(expression);
+        }
+    },
+    emit: function (eventName, responseObject ) {
+      return {
+        eventName: eventName,
+        responseObject: responseObject
+      };
     }
   };
 };

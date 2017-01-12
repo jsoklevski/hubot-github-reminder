@@ -2,6 +2,7 @@
   env:
     # Adds all of the Mocha testing global variables
     mocha: true
+    nnode: true
 
   rules:
 
@@ -12,3 +13,14 @@
     # Instead use the `code` module or `val.should.have.type('string');`
     # TODO: Remove this rule when tests have been changed.
     no-unused-expressions: 1
+
+
+    # Enforce single quotes
+    quotes:
+      - 2
+      - "single"
+      - "avoid-escape"
+
+
+    # Allows the use of `this_is_a_variable_name`
+    camelcase: 0
