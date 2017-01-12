@@ -87,6 +87,12 @@ class GithubBot
         text: """
           Warining: No Github Username provived, i will use slack username, please provide github username if different using #{@robot.name} github I am <user>
         """
+
+    @robot.on "CacheInitializationSuccess", (user) =>
+      @adapter.dm user,
+        text: """
+              Cache Succesifully Initilized
+        """
   registerRobotResponses: ->
 
     @robot.respond Patterns.NOTIFICATIONS_SWITCH, (msg) =>
@@ -122,8 +128,9 @@ class GithubBot
       @send msg, " #{hubotUser} saved as #{github_user}"
 
     @robot.hear Patterns.INIT_CACHE, (msg) =>
-      @cacheRefresh.clearCache()
-      @send msg, "Cache initialized"
+      hubotUser = msg.message.user
+      @cacheRefresh.clearCache(hubotUser)
+      @send msg, "Cache initialization started, please wait..."
 
     @robot.respond Patterns.DELETE_REMINDERS, (msg) =>
       hubotUser = msg.message.user.name

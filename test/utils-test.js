@@ -61,7 +61,7 @@ describe(__filename, function() {
     describe('test logic for formation pr', function() {
 
       it('should format pr', function(done) {
-        var formated_pr_to_check = utils.formatPullRequest(new_pr, 'test-repo');
+        var formated_pr_to_check = utils.formatPullRequest(new_pr);
         formated_pr_to_check.should.eql(formated_pr);
         done();
       });

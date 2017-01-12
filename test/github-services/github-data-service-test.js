@@ -4,6 +4,7 @@ var github_data_service = require('../../lib/github-services/github-data-service
     test_util = require('../../test-util/common-test-util.js'),
     cached_pr = require('../mock-data/cached-pr.json'),
     new_pr = require('../mock-data/new-pr.json'),
+    formated_pr = require('../mock-data/formated-pr.json'),
     updated_cache = require('../mock-data/updated-cache.json'),
     exiting_pr = require('../mock-data/updated-existing-pr.json'),
     closed_pr = require('../mock-data/close-existing-pr.json'),
@@ -63,21 +64,21 @@ describe(__filename, function() {
     describe('test for updating open pr cache', function() {
 
       it('should add new pr', function(done) {
-        github_data_service.updatePullRequestsCache(robot, new_pr);
+        github_data_service.updatePullRequestsCache(robot, formated_pr, new_pr.state);
         var updated_cache_to_check = robot.brain.get('github-pr-cache');
         updated_cache_to_check.should.eql(updated_cache);
         done();
       });
 
-      it('should update exitsting pr', function(done) {
-        github_data_service.updatePullRequestsCache(robot, exiting_pr);
+      it('should update existing pr', function(done) {
+        github_data_service.updatePullRequestsCache(robot, exiting_pr, 'open');
         var updated_cache_to_check = robot.brain.get('github-pr-cache');
         updated_cache_to_check.length.should.eql(3);
         done();
       });
 
       it('should remove closed pr', function(done) {
-        github_data_service.updatePullRequestsCache(robot, closed_pr);
+        github_data_service.updatePullRequestsCache(robot, closed_pr, 'closed');
         var updated_cache_to_check = robot.brain.get('github-pr-cache');
         updated_cache_to_check.length.should.eql(2);
         done();
