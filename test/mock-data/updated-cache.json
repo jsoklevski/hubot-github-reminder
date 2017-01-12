@@ -49,6 +49,7 @@
     "additions":1,
     "deletions":1,
     "assignees":["test345"],
+    "statusChecks": {},
     "repo":"test-repo"
   }
 ]

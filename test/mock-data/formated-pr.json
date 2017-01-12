@@ -8,6 +8,7 @@
   "mergeable":true,
   "additions":1,
   "deletions":1,
+  "statusChecks": {},
   "assignees":["test345"],
   "repo":"test-repo"
 }

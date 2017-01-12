@@ -1,6 +1,6 @@
 { "url": "https://xxx.com/",
   "id": 456789,
-  "html_url": "https://xxx.com/",
+  "htmlUrl": "https://xxx.com/",
   "diff_url": "https://xxx.com/",
   "patch_url": "https://xxx.com/",
   "issue_url": "https://xxx.com/",

@@ -28,11 +28,11 @@
 
 
 _ = require 'underscore'
-Generic = require "./hubot-message-adapters/generic"
 Patterns = require "./patterns"
 GitHubDataService = require "./github-services/github-data-service"
 PrCacheInitializer = require("./github-services/pr-cache-initializer").PullRequestsCacheInit
 GithubWebhookHandler = require("./github-services/github-webhook-handler").WebhookHandler
+Generic = require("./hubot-message-adapters/generic").GenericAdapter
 Reminders = require("./github-services/pr-reminders").Reminders
 utils = require "./utils"
 
