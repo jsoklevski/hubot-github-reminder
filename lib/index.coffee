@@ -29,22 +29,21 @@
 
 
 _ = require 'underscore'
-Adapters = require "./adapters"
+Adapters = require "./hubot-message-adapters"
 Patterns = require "./patterns"
 GitHubDataService = require "./github-services/github-data-service"
-PrCacheInitializer = require "./github-services/pr-cache-initializer"
-GithubWebhookHandler = require "./github-services/github-webhook-handler"
-Reminders = require "./reminders"
-Utils = require "./utils"
+PrCacheInitializer = require("./github-services/pr-cache-initializer").PullRequestsCacheInit
+GithubWebhookHandler = require("./github-services/github-webhook-handler").WebhookHandler
+Reminders = require("./github-services/pr-reminders").Reminders
+utils = require "./utils"
 
 class GithubBot
 
   constructor: (@robot) ->
     return new GithubBot @robot unless @ instanceof GithubBot
-    Utils.robot = @robot
-    @reminders = new Reminders @robot, "github-reminders", (hubotUser) ->
-      hubotUserObject = Utils.findUser hubotUser
-      GitHubDataService.openForUser hubotUserObject
+    @reminders = new Reminders @robot, (hubotUser) ->
+      hubotUserObject = utils.findUser @robot, hubotUser
+      GitHubDataService.openForUser @robot.brain, hubotUserObject
 
     @cacheRefresh = new PrCacheInitializer @robot
     @webhook = new GithubWebhookHandler @robot
@@ -124,7 +123,7 @@ class GithubBot
     @robot.hear Patterns.REMEMBER_USER, (msg) =>
       hubotUser = msg.message.user.name
       github_user = msg.match[1]
-      Utils.saveGithubUser hubotUser, github_user
+      utils.rememberUser @robot.brain, hubotUser, github_user
       @send msg, " #{hubotUser} saved as #{github_user}"
 
     @robot.hear Patterns.INIT_CACHE, (msg) =>
@@ -151,7 +150,7 @@ class GithubBot
     @robot.respond Patterns.CREATE_REMINDER, (msg) =>
       [__, time] = msg.match
       hubotUser = msg.message.user.name
-      githubUserName = Utils.lookupUserWithHubot hubotUser
+      githubUserName = utils.lookupUserWithHubot @robot.brain, hubotUser
       @reminders.save hubotUser, time
       if githubUserName
         @send msg, "Ok, from now on I'll remind this room about open pull requests every weekday at #{time}"
@@ -188,6 +187,6 @@ class GithubBot
       hubotUser = msg.message.user
 
       @robot.logger.debug "Get PR for  #{hubotUser.name}"
-      GitHubDataService.openForUser hubotUser
+      GitHubDataService.openForUser @robot, hubotUser
 
   module.exports = GithubBot
