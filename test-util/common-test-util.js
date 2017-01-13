@@ -11,7 +11,7 @@ internals.mockRobotBrain = function() {
     set: function(key, val) {
       brain[key] = val;
     },
-    once: function(when, callback) {
+    post: function(when, callback) {
       setTimeout(callback, 1000);
     },
     users: function() {
@@ -43,6 +43,9 @@ exports.mockRobot = function () {
         debug: function(expression) {
           console.log(expression);
         }
+    },
+    once: function(when, callback) {
+      setTimeout(callback, 1000);
     },
     emit: function (eventName, responseObject ) {
       return {
