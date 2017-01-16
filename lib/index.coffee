@@ -121,13 +121,13 @@ class GithubBot
 
 
 
-    @robot.hear Patterns.REMEMBER_USER, (msg) =>
+    @robot.respond Patterns.REMEMBER_USER, (msg) =>
       hubotUser = msg.message.user.name
       github_user = msg.match[1]
       utils.rememberUser @robot.brain, hubotUser, github_user
       @send msg, " #{hubotUser} saved as #{github_user}"
 
-    @robot.hear Patterns.INIT_CACHE, (msg) =>
+    @robot.respond Patterns.INIT_CACHE, (msg) =>
       hubotUser = msg.message.user
       @cacheRefresh.clearCache(hubotUser)
       @send msg, "Cache initialization started, please wait..."
