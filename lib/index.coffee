@@ -85,14 +85,21 @@ class GithubBot
       @robot.logger.debug "Sending Warning Message to #{user.name}"
       @adapter.dm user,
         text: """
-          Warining: No Github Username provived, i will use slack username, please provide github username if different using #{@robot.name} github I am <user>
+          Warining: No Github Username provived, i will use slack username, please provide github username if it is different using #{@robot.name} github I am <user>
         """
 
-    @robot.on "CacheInitializationSuccess", (user) =>
-      @adapter.dm user,
-        text: """
+    @robot.on "CacheInitialization", (user, success) =>
+      if success
+        @adapter.dm user,
+          text: """
               Cache Succesifully Initilized
         """
+      else
+        @adapter.dm user,
+          text: """
+              Cache Initialization failed. Please try again.
+        """
+
   registerRobotResponses: ->
 
     @robot.respond Patterns.NOTIFICATIONS_SWITCH, (msg) =>
