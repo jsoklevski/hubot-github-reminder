@@ -40,10 +40,7 @@ class GithubBot
 
   constructor: (@robot) ->
     return new GithubBot @robot unless @ instanceof GithubBot
-    @reminders = new Reminders @robot, (hubotUser) ->
-      hubotUserObject = utils.findUser @robot, hubotUser
-      GitHubDataService.openForUser @robot.brain, hubotUserObject, false
-
+    @reminders = new Reminders @robot
     @cacheRefresh = new PrCacheInitializer @robot
     @webhook = new GithubWebhookHandler @robot
 
@@ -62,15 +59,12 @@ class GithubBot
       > github disable notifications
     """
 
-    @robot.on "GithubPullRequestAssigned", (pr, sender) =>
-      @robot.logger.debug "Sending PR assignment notice to #{pr.assignee}"
-      @adapter.dm sender,
-        text: """
-          You have just been assigned to a pull request
-        """
+    @robot.on "GithubPullRequestAssigned", (pr, user) =>
+      @robot.logger.info "Sending PR assignment notice to #{pr.assignees}"
+      message =
         footer: disableDisclaimer
         attachments: [ pr.toAttachment() ]
-
+      @adapter.dm user, message
   registerEventListeners: ->
     @robot.on "GithubPullRequestsOpenForUser", (prs, user) =>
       @robot.logger.debug "Sending Pulls Requests #{user}"

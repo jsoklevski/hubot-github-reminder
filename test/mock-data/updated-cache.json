@@ -50,6 +50,7 @@
     "deletions":1,
     "assignees":["test345"],
     "statusChecks": {},
-    "repo":"test-repo"
+    "repo":"test-repo",
+    "action": ""
   }
 ]

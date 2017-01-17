@@ -19,7 +19,7 @@ describe(__filename, function() {
 
       it('should save user and return it', function(done) {
         utils.rememberUser(robot.brain, 'test', 'test');
-        var hubotUser = utils.lookupUserWithGithub(robot.brain, 'test');
+        var hubotUser = utils.lookupUserWithGithub(robot, 'test');
         hubotUser.should.eql({
           name: 'test',
           id: 'test',
@@ -27,7 +27,16 @@ describe(__filename, function() {
         });
         done();
       });
-
+      it('should save user and return it', function(done) {
+        utils.rememberUser(robot.brain, 'test', 'xxx');
+        var hubotUser = utils.lookupUserWithGithub(robot, 'xxx');
+        hubotUser.should.eql({
+          name: 'test',
+          id: 'test',
+          real_name: 'test'
+        });
+        done();
+      });
       it('should save user and return it', function(done) {
         utils.rememberUser(robot.brain, 'test', 'test789');
         var github_username = utils.lookupUserWithHubot(robot.brain, 'test');
@@ -42,7 +51,7 @@ describe(__filename, function() {
       });
 
       it('should return hubot user if there is one same as github username', function(done) {
-        var hubotUser = utils.lookupUserWithGithub(robot.brain, 'test123');
+        var hubotUser = utils.lookupUserWithGithub(robot, 'test123');
         hubotUser.should.eql({
           name: 'test123',
           id: 'test123',
@@ -52,7 +61,7 @@ describe(__filename, function() {
       });
 
       it('should not return anything for not exisitng user', function(done) {
-        var hubotUser = utils.lookupUserWithGithub(robot.brain, 'test456');
+        var hubotUser = utils.lookupUserWithGithub(robot, 'test456');
         should.not.exist(hubotUser);
         done();
       });
