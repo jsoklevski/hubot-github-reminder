@@ -32,6 +32,7 @@ Patterns = require "./patterns"
 GitHubDataService = require "./github-services/github-data-service"
 PrCacheInitializer = require("./github-services/pr-cache-initializer").PullRequestsCacheInit
 GithubWebhookHandler = require("./github-services/github-webhook-handler").WebhookHandler
+PrSatusCheckWorker = require("./github-services/pr-status-check-worker").PrStatusCheckWorker
 Generic = require("./hubot-message-adapters/generic").GenericAdapter
 Reminders = require("./github-services/pr-reminders").Reminders
 utils = require "./utils"
@@ -42,7 +43,8 @@ class GithubBot
     return new GithubBot @robot unless @ instanceof GithubBot
     @reminders = new Reminders @robot
     @cacheRefresh = new PrCacheInitializer @robot
-    @webhook = new GithubWebhookHandler @robot
+    @prSatusCheck = new PrSatusCheckWorker @robot
+    @webhook = new GithubWebhookHandler @robot, @prSatusCheck
 
     @adapter = new Generic @robot
 
@@ -121,7 +123,9 @@ class GithubBot
           > github enable notifications
           """
 
-
+    @robot.respond Patterns.CLEAR_ALL_STATUS_CHECKS, (msg) =>
+      @prSatusCheck.clearAllStatusChecks()
+      @send msg, "Status checks removed"
 
     @robot.respond Patterns.REMEMBER_USER, (msg) =>
       hubotUser = msg.message.user.name
