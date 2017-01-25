@@ -54,17 +54,17 @@ class GithubBot
     @adapter.send context, message
 
   registerWebhookListeners: ->
-    disableDisclaimer = """
-      If you wish to stop receiving notifications for pull request assignments, reply with:
-      > github disable notifications
-    """
-
     @robot.on "GithubPullRequestAssigned", (pr, user) =>
-      @robot.logger.info "Sending PR assignment notice to #{pr.assignees}"
+      text = ""
+      if user
+        @robot.logger.info "Sending PR notification to #{user.name}"
+        text = "Notification PR assignment for user " + "<@#{@user.id}>"
+      room = utils.getRoomForNotifications
       message =
-        footer: disableDisclaimer
+        text: text
         attachments: [ pr.toAttachment() ]
-      @adapter.dm user, message
+      @adapter.send message: room: room.id, message
+
   registerEventListeners: ->
     @robot.on "GithubPullRequestsOpenForUser", (prs, user) =>
       @robot.logger.debug "Sending Pulls Requests #{user}"
