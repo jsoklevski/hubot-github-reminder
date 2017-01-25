@@ -59,7 +59,7 @@ class GithubBot
       if user
         @robot.logger.info "Sending PR notification to #{user.name}"
         text = "PR notification for user " + "<@#{@user.id}>"
-      room = utils.getRoomForNotifications
+      room = utils.getRoomForNotifications()
       @robot.logger.info "Sending PR notification to room  #{room.id}"
       message =
         text: text
