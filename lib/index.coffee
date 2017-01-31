@@ -48,27 +48,35 @@ class GithubBot
 
     @adapter = new Generic @robot
 
-    @registerWebhookListeners()
     @registerEventListeners()
     @registerRobotResponses()
 
   send: (context, message) ->
     @adapter.send context, message
 
-  registerWebhookListeners: ->
-    @robot.on "GithubPullRequestAssigned", (pr, user) =>
-      text = ""
-      if user
-        @robot.logger.info "Sending PR notification to #{user.name}"
-        text = "PR notification for user  <@#{user.id}>"
-      room = utils.getRoomForNotifications @robot
-      @robot.logger.info "Sending PR notification to room  #{room.id}"
+
+  registerEventListeners: ->
+    @robot.on "GithubPRAuthorNotification", (pr, user, statusChecksPassed, assignee) =>
+      @robot.logger.info "Sending author notification to #{user.name}"
+      text = "There are failing status checks!!! Please fix them before assignees can be notified."
+      if statusChecksPassed
+        if assignee
+          text = "Assignee #{assignee.name} has been notified"
+        else
+          text = "Assignee has not provided github username to me, skipping notification!!!"
       message =
         text: text
         attachments: [ pr.toAttachment() ]
-      @adapter.send message: room: room.id, message
+      @adapter.dm user, message
 
-  registerEventListeners: ->
+    @robot.on "GithubPullRequestAssigned", (pr, user) =>
+      @robot.logger.info "Sending PR notification to #{user.name}"
+      text = "PR Assignment Notification"
+      message =
+        text: text
+        attachments: [ pr.toAttachment() ]
+      @adapter.dm user, message
+
     @robot.on "GithubPullRequestsOpenForUser", (prs, user) =>
       @robot.logger.debug "Sending Pulls Requests #{user}"
       if prs.length is 0
