@@ -4,6 +4,8 @@
   "state":"open",
   "title":"Update to version 5.0.1 🚀",
   "author":"test123",
+  "authorAvatarUrl": "https://xxx.com/",
+  "authorHtmlUrl": "https://xxx.com/",
   "updatedAt":"2016-12-05T20:43:24Z",
   "mergeable":true,
   "additions":1,

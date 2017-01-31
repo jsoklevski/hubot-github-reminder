@@ -56,14 +56,14 @@ class GithubBot
 
 
   registerEventListeners: ->
-    @robot.on "GithubPRAuthorNotification", (pr, user, statusChecksPassed, assignee) =>
+    @robot.on "GithubPRAuthorNotification", (pr, user, statusChecksPassed, missing_usernames) =>
       @robot.logger.info "Sending author notification to #{user.name}"
       text = "There are failing status checks!!! Please fix them before assignees can be notified."
       if statusChecksPassed
-        if assignee
-          text = "Assignee #{assignee.name} has been notified"
+        if missing_usernames and missing_usernames.length > 0
+          text = "!!!The following github users can not be matched to slack user " + JSON.stringify(missing_usernames)
         else
-          text = "Assignee has not provided github username to me, skipping notification!!!"
+          text = "All assignees have been notified"
       message =
         text: text
         attachments: [ pr.toAttachment() ]
@@ -190,14 +190,16 @@ class GithubBot
         I can remind you about open pull requests for the assigned to you
         Use me to create a reminder, and then I'll post in this room every weekday at the time you specify. Here's how:
 
+        github (enable|disable) notifications - Enables or disables notifications for current user
         github list open pr - Shows a list of open pull requests assigned to the current user
         github list my open pr - Show a list of open PRs that the current user created
         github remind hh:mm - I'll remind about open pull requests in this room at hh:mm every weekday.
         github list reminders - See all pull request reminders for this room.
         github delete hh:mm reminder - If you have a reminder at hh:mm, I'll delete it.
         github delete all reminders - Deletes all reminders for this room.
-        github I am <user> - Provides the github username for the given slack user
-        github Init cache - Reinitializes cache
+        github I am <user> - Provides the GitHub username for the given slack user
+        github Init cache - Re-initializes cache
+        github clear all status checks - Removes all status checks for all prs
       """
 
     @robot.respond Patterns.LIST_OPEN_PR, (msg) =>

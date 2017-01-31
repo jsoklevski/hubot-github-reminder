@@ -11,7 +11,8 @@
   "user": {
     "login": "test123",
     "id": 61638,
-    "avatar_url": "https://xxx.com/",
+    "avatarUrl": "https://xxx.com/",
+    "htmlUrl": "https://xxx.com/",
     "gravatar_id": ""
   },
   "body": "Hello lovely humans",

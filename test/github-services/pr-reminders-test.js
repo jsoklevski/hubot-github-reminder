@@ -11,7 +11,7 @@ describe(__filename, function() {
 
     describe('save reminder and list reminder for user', function() {
 
-      it('should seve a reminder for user and thn remove it', function(done) {
+      it('should save a reminder for user and thn remove it', function(done) {
         var reminders = new Reminders(robot);
         reminders.save('test', '09:10');
         var remindersForUser = reminders.getForUser('test');
