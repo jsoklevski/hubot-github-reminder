@@ -68,6 +68,7 @@ describe(__filename, function() {
           repoName: 'xxx',
           assigneesList: ['yyy', 'zzz'],
           authorNotified: false,
+          reviewersList: [],
           time_created: statusCheck.time_created
         }];
         reminders.should.eql(result);
@@ -94,7 +95,7 @@ describe(__filename, function() {
         statusCheckWorker.removeAssignee({
           pr: 345,
           repoName: 'xxx',
-          assigneesList: ['zzz']
+          assignee: 'zzz'
         });
         var reminders = statusCheckWorker.getStatusChecks();
         var result = [{
@@ -102,6 +103,7 @@ describe(__filename, function() {
           repoName: 'xxx',
           assigneesList: ['yyy'],
           authorNotified: false,
+          reviewersList: [],
           time_created: statusCheck.time_created
         }];
         reminders.should.eql(result);

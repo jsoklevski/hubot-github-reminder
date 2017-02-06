@@ -11,6 +11,7 @@
   "additions":1,
   "deletions":1,
   "statusChecks": {},
+  "requestedReviewers": [],
   "assignees":["test345"],
   "repo":"test-repo",
   "action": ""

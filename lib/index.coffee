@@ -63,7 +63,7 @@ class GithubBot
         if missing_usernames and missing_usernames.length > 0
           text = "!!!The following github users can not be matched to slack user " + JSON.stringify(missing_usernames)
         else
-          text = "All assignees have been notified"
+          text = "All assignees and reviewers have been notified"
       message =
         text: text
         attachments: [ pr.toAttachment() ]
@@ -72,6 +72,14 @@ class GithubBot
     @robot.on "GithubPullRequestAssigned", (pr, user) =>
       @robot.logger.info "Sending PR notification to #{user.name}"
       text = "PR Assignment Notification"
+      message =
+        text: text
+        attachments: [ pr.toAttachment() ]
+      @adapter.dm user, message
+
+    @robot.on "GithubPullRequestReviewRequested", (pr, user) =>
+      @robot.logger.info "Sending PR review request to #{user.name}"
+      text = "PR Review Request"
       message =
         text: text
         attachments: [ pr.toAttachment() ]
@@ -187,7 +195,7 @@ class GithubBot
 
     @robot.respond Patterns.BOT_HELP, (msg) =>
       @send msg, """
-        I can remind you about open pull requests for the assigned to you
+        I can remind you about open pull requests assigned to you
         Use me to create a reminder, and then I'll post in this room every weekday at the time you specify. Here's how:
 
         github (enable|disable) notifications - Enables or disables notifications for current user
