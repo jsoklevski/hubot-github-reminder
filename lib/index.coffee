@@ -69,6 +69,22 @@ class GithubBot
         attachments: [ pr.toAttachment() ]
       @adapter.dm user, message
 
+    @robot.on "GithubPullRequestReviewSubmitted", (pr, user) =>
+      @robot.logger.info "Sending PR notification to #{user.name}"
+      text = "PR Review Submitted"
+      message =
+        text: text
+        attachments: [ pr.toAttachment() ]
+      @adapter.dm user, message
+
+    @robot.on "GithubPullRequestReviewComment", (pr, user) =>
+      @robot.logger.info "Sending PR notification to #{user.name}"
+      text = "PR Review Comment"
+      message =
+        text: text
+        attachments: [ pr.toAttachment() ]
+      @adapter.dm user, message
+
     @robot.on "GithubPullRequestAssigned", (pr, user) =>
       @robot.logger.info "Sending PR notification to #{user.name}"
       text = "PR Assignment Notification"
@@ -151,7 +167,7 @@ class GithubBot
 
     @robot.respond Patterns.INIT_CACHE, (msg) =>
       hubotUser = msg.message.user
-      @cacheRefresh.clearCache(hubotUser)
+      @cacheRefresh.clearCache(true, hubotUser)
       @send msg, "Cache initialization started, please wait..."
 
     @robot.respond Patterns.DELETE_REMINDERS, (msg) =>
