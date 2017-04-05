@@ -70,7 +70,7 @@ class GithubBot
       @adapter.dm user, message
 
     @robot.on "GithubPullRequestReviewSubmitted", (pr, user) =>
-      @robot.logger.info "Sending PR notification to #{user.name}"
+      @robot.logger.info "Sending PR review notification to #{user.name}"
       text = "PR Review Submitted"
       message =
         text: text
@@ -78,7 +78,7 @@ class GithubBot
       @adapter.dm user, message
 
     @robot.on "GithubPullRequestReviewComment", (pr, user) =>
-      @robot.logger.info "Sending PR notification to #{user.name}"
+      @robot.logger.info "Sending PR comment notification to #{user.name}"
       text = "PR Review Comment"
       message =
         text: text
